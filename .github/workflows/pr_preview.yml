@@ -1,35 +1,13 @@
-name: PR Preview
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-jobs:
-  preview:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Kind cluster (ephemeral)
-        uses: helm/kind-action@v1
-        with:
-          cluster_name: pib-ci
-
-      - name: Install Helm
-        uses: azure/setup-helm@v4
-
-      - name: Deploy preview (placeholder)
+      - name: Deploy preview with PR image
         env:
           NAMESPACE: pr-${{ github.event.pull_request.number }}
+          IMAGE_REPO: ghcr.io/${{ github.repository }}/app
+          IMAGE_TAG: pr-${{ github.event.pull_request.number }}
         run: |
           kubectl create ns $NAMESPACE || true
-          kubectl get ns
-
-      - name: Comment namespace
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          recreate: true
-          message: |
-            Preview deployed to namespace **pr-${{ github.event.pull_request.number }}** on a kind cluster (CI demo).
+          helm upgrade --install pib-preview ./helm/platform-in-a-box \
+            -n $NAMESPACE \
+            --set image.repository=$IMAGE_REPO \
+            --set image.tag=$IMAGE_TAG \
+            -f ./helm/platform-in-a-box/values.local.yaml
+          kubectl get deploy,svc,pods -n $NAMESPACE
