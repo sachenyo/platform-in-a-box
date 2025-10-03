@@ -1,0 +1,17 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: API tests
+        run: |
+          cd apps/api && npm i && npm test
+      - name: Web tests
+        run: |
+          cd apps/web && npm i && npm test

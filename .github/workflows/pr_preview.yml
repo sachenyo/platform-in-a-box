@@ -1,0 +1,39 @@
+name: PR Preview
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  preview:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+      - name: Configure kubeconfig (assumes OIDC role or pre-set KUBECONFIG secret)
+        run: |
+          echo "$KUBECONFIG_CONTENT" | base64 -d > kubeconfig
+          echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
+      - name: Create namespace
+        run: kubectl create ns pr-${{ github.event.number }} --dry-run=client -o yaml | kubectl apply -f -
+      - name: Set images in values
+        run: |
+          sed -i "s/platform-api:latest/platform-api:${{ github.sha }}/" deploy/helm/platform/values.yaml
+          sed -i "s/platform-web:latest/platform-web:${{ github.sha }}/" deploy/helm/platform/values.yaml
+      - name: Deploy
+        run: helm upgrade --install platform deploy/helm/platform -n pr-${{ github.event.number }}
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/setup-kubectl@v4
+      - name: Configure kubeconfig
+        run: |
+          echo "$KUBECONFIG_CONTENT" | base64 -d > kubeconfig
+          echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
+      - name: Delete namespace
+        run: kubectl delete ns pr-${{ github.event.number }} --ignore-not-found=true

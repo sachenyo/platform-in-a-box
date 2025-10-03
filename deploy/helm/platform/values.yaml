@@ -1,0 +1,21 @@
+﻿namespace: platform
+
+image:
+  registry: ghcr.io
+  owner: sachenyo
+
+api:
+  image: "platform-api:latest"
+  replicas: 2
+  port: 3000
+
+web:
+  image: "platform-web:latest"
+  replicas: 2
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "platform.local"
+

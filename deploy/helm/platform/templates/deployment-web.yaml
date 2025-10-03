@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-web
+spec:
+  replicas: {{ .Values.web.replicas }}
+  selector:
+    matchLabels: { app: platform-web }
+  template:
+    metadata:
+      labels: { app: platform-web }
+    spec:
+      containers:
+        - name: web
+          image: "{{ .Values.image.registry }}/{{ .Values.image.owner }}/{{ .Values.web.image }}"
+          ports:
+            - containerPort: {{ .Values.web.port }}
+          readinessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.web.port }} }
+            initialDelaySeconds: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.web.port }} }
+            initialDelaySeconds: 10
