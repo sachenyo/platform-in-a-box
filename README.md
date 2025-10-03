@@ -1,5 +1,24 @@
 # Platform-in-a-Box (EKS + Terraform + GitHub Actions + Helm)
 
+[![CI](https://github.com/sachenyo/platform-in-a-box/actions/workflows/ci.yml/badge.svg)](https://github.com/sachenyo/platform-in-a-box/actions/workflows/ci.yml)
+[![Release](https://github.com/sachenyo/platform-in-a-box/actions/workflows/cd_release.yml/badge.svg)](https://github.com/sachenyo/platform-in-a-box/actions/workflows/cd_release.yml)
+[![PR Preview](https://github.com/sachenyo/platform-in-a-box/actions/workflows/pr_preview.yml/badge.svg)](https://github.com/sachenyo/platform-in-a-box/actions/workflows/pr_preview.yml)
+
+## Quickstart (local, 5 min)
+
+Requirements: Docker Desktop, kubectl, helm, **kind** (optional).
+
+```bash
+# Local proof (optional if you don’t have kind)
+kind create cluster --name pib
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
+# TODO: replace with your app chart when ready:
+# helm upgrade --install platform-in-a-box ./helm/platform-in-a-box -n demo --create-namespace -f ./helm/platform-in-a-box/values.local.yaml
+kubectl get pods -A
+
+
 **Goal:** A realistic, recruitable demo that shows you can provision AWS infra with Terraform, run workloads on EKS with Helm, and ship with GitHub Actions (CI, image build, PR previews, tagged releases).
 
 ## What it does
