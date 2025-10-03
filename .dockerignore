@@ -1,0 +1,6 @@
+﻿node_modules
+.git
+.github
+deploy/proof
+infra
+helm/**/charts
