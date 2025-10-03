@@ -1,17 +1,31 @@
 name: CI
 on:
-  pull_request:
   push:
-    branches: [ main ]
+    branches: [ main, polish/** ]
+  pull_request:
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
-      - name: API tests
+
+      - name: Build container
         run: |
-          cd apps/api && npm i && npm test
-      - name: Web tests
+          IMAGE=ghcr.io/${{ github.repository }}/app:pr-${{ github.run_number }}
+          docker build -t $IMAGE .
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image
         run: |
-          cd apps/web && npm i && npm test
+          IMAGE=ghcr.io/${{ github.repository }}/app:pr-${{ github.run_number }}
+          docker push $IMAGE
