@@ -10,22 +10,29 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      IMAGE_BASE: ghcr.io/${{ github.repository }}/app
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build container
+      - name: Build image
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/app:pr-${{ github.run_number }}
-          docker build -t $IMAGE .
+          docker build -t $IMAGE_BASE:sha-${GITHUB_SHA} .
 
-      - name: Login GHCR
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push image
+      - name: Push image (sha tag)
+        run: docker push $IMAGE_BASE:sha-${GITHUB_SHA}
+
+      # >>> THIS IS STEP 3: tag with the PR number and push <<<
+      - name: Tag & push PR-number image
+        if: github.event_name == 'pull_request'
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/app:pr-${{ github.run_number }}
-          docker push $IMAGE
+          docker tag $IMAGE_BASE:sha-${GITHUB_SHA} $IMAGE_BASE:pr-${{ github.event.pull_request.number }}
+          docker push $IMAGE_BASE:pr-${{ github.event.pull_request.number }}
