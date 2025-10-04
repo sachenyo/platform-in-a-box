@@ -1,5 +1,10 @@
 # Platform-in-a-Box (EKS + Terraform + GitHub Actions + Helm)
 
+### Proof
+- Local kind cluster with NGINX Ingress.
+- App responds at `/healthz` via Helm chart.
+- Screenshots: [/deploy/proof](/deploy/proof) (pods, ingress).
+
 ### Local quickstart (Makefile)
 ```bash
 make kind-up && make deploy-local && make status
