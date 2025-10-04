@@ -1,5 +1,11 @@
 # Platform-in-a-Box (EKS + Terraform + GitHub Actions + Helm)
 
+### Local quickstart (Makefile)
+```bash
+make kind-up && make deploy-local && make status
+# or use the raw commands in this README if you don't have 'make'
+
+
 [![CI](https://github.com/sachenyo/platform-in-a-box/actions/workflows/ci.yml/badge.svg)](https://github.com/sachenyo/platform-in-a-box/actions/workflows/ci.yml)
 [![Release](https://github.com/sachenyo/platform-in-a-box/actions/workflows/cd_release.yml/badge.svg)](https://github.com/sachenyo/platform-in-a-box/actions/workflows/cd_release.yml)
 [![PR Preview](https://github.com/sachenyo/platform-in-a-box/actions/workflows/pr_preview.yml/badge.svg)](https://github.com/sachenyo/platform-in-a-box/actions/workflows/pr_preview.yml)

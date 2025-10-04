@@ -1,0 +1,24 @@
+replicaCount: 1
+
+image:
+  repository: platform-in-a-box
+  tag: "dev"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: pib.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests: { cpu: 50m, memory: 128Mi }
+  limits:   { cpu: 300m, memory: 256Mi }
